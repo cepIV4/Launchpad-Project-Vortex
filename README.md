@@ -1,0 +1,7 @@
+# Launchpad Project Vortex
+
+An OpenFOAM-10 (Foundation) rhoPimpleFoam case for the STARSociety's Launchpad Project Vortex high school rocketry program. Simulating transonic flow (Mach 0.9 at 3000ft) of the rocket.
+
+Launchpad Project Vortex is a rocketry program for high school students in the Rio Grande Valley. We are utilizing the commercial off-the-shelf rocket body Ultimate Darkstar by Wildman Rocketry. This case intends to use the rhoPimpleFoam solver to simluate the external aerodynamic flow of the rocket at Mach 0.9, our peak expected speed, at the atmospheric conditions of 3000ft.
+
+NOTE: I am a high school senior with <1 year of experience with computational fluid dynamics (CFD) and with my most advanced STEM classes being Calculus 1 and Physics 1 (algebra-based) at the University of Texas Rio Grande Valley. I am, as of March 2026, self-studying for the AP Physics C Mechanics test. I honestly do not understand much of the physics or math that I'm doing in OpenFOAM, but I know how to get it to work and I am building my understanding through online readings. In addition, Claude.ai is responsible for providing the basis for all files, but I chose to handtype each line of code (nothing is copied and pasted) to practice my C++ and to better understand everything I'm doing.
