@@ -1,0 +1,29 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      surfaceFeatureDict;
+}
+
+// generates constant/extendedFeatureEdgeMesh/darkstarFilledScaledDown.extendedFeatureEdgeMesh
+// generates .eMesh file referenced in snappyHexMesh
+
+surfaces
+{
+    darkstarFilledScaledDown.stl
+    {
+        extractionMethod        extractFromSurface;
+
+        extractFromSurfaceCoeffs
+        {
+            includedAngle       150;
+                // captures edges sharper than 30deg
+                // increase to 160 or 170 for more smoothness
+        }
+
+        writeObj                yes;
+            // write .obj for visual inspection in ParaView
+    }
+}

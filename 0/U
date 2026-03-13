@@ -1,0 +1,50 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U;
+}
+
+// ISA @ 3000 ft | Mach 0.9 | T=282.21K | a=336.8 m/s | U=303.1 m/s (+X)
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (303.1 0 0);
+
+boundaryField
+{
+    inlet  
+    {
+        type        fixedValue;
+        value       uniform (303.1 0 0);
+    }
+    //freestream v inlet
+    //nose points in +x dir --> value is in +x dir
+
+    outlet
+    {
+        type        inletOutlet;
+        inletValue  uniform (303.1 0 0);
+        value       uniform (303.1 0 0);
+    }
+    //p outlet
+    //allows flow to exit freely
+
+    darkstarFilledScaledDown
+    {
+        type        noSlip;
+    }
+    //no-slip wall w wall functions for k-omega SST (y+ 30-300)
+
+    farfield
+    {
+        type        freestreamVelocity;
+        freestreamValue uniform (303.1 0 0);
+    }
+
+    symmetry
+    {
+        type        symmetryPlane;
+    }
+}

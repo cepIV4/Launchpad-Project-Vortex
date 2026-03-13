@@ -1,0 +1,95 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      blockMeshDict;
+}
+
+// outer domain for half-body rocket sim (symmetry plane at z = 0)
+// flow in +x dir w rocket nose near x = 0 and aft near x = 1 
+// domain sizing rule for external aero
+    // upstream --> 5-10 body lengths
+    // downstream --> 10-15 body lengths
+    // radial --> 10-15 diameters
+// PLACEHOLDER --> adjust xMin, xMax, yMax, and zMax to match rocket length
+// assume rocket L = 1 and diameter = 0.1567
+
+// domain extents
+    // x: -5(upstream) - 12(downstream)
+    // y: -1.5 - 1.5
+    // z: 0 - 1.5 (half body, symmetry at z = 0)
+
+convertToMeters     1;
+
+vertices
+(
+    (-5 -1.5 0)     // 0
+    (12 -1.5 0)     // 1
+    (12 1.5 0)      // 2
+    (-5 1.5 0)      // 3
+
+    (-5 -1.5 1.5)   // 4
+    (12 -1.5 1.5)   // 5
+    (12 1.5 1.5)    // 6
+    (-5 1.5 1.5)    // 7
+);
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7)
+    (34 6 6) // 34 cells in x dir, 6 in y dir, 6 in z dir (coarse background)
+    simpleGrading (1 1 1)
+// single coarse block that snappyHexMesh refines near the rocket
+);
+
+edges
+(
+);
+
+boundary
+(
+    inlet
+    {
+        type        patch;
+        faces
+        (
+            (0 3 7 4)   // x = -5 face
+        );
+        
+    }
+
+    outlet
+    {
+        type        patch;
+        faces
+        (
+            (1 2 6 5)   // x = +12 face
+        );
+    }
+
+    farfield
+    {
+        type        patch;
+        faces
+        (
+            (0 1 5 4)   // y = -1.5 face
+            (3 2 6 7)   // y = +1.5 face
+            (4 5 6 7)   // z = +1.5 face (top)
+        );
+    }
+
+    symmetry
+    {
+        type        symmetryPlane;
+        faces
+        (
+            (0 1 2 3)   // z = 0 face (symmetry plane)
+        );
+    }
+);
+
+mergePatchPairs
+(
+);

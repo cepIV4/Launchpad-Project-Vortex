@@ -1,0 +1,48 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      omega;
+}
+
+//omega = (k^0.5)/((Cmu^0.25)(L)) = (0.3714)/((0.5477)(0.001567)) = 1.407e5 rad/s
+//L = 0.001567m (1% of rocket diameter)
+
+dimensions      [0 0 -1 0 0 0 0];
+
+internalField   uniform 140700;
+
+boundaryField
+{
+    inlet
+    {
+        type        turbulentMixingLengthFrequencyInlet;
+        mixingLength    0.001567;
+        value       uniform 140700;
+    }
+
+    outlet
+    {
+        type        inletOutlet;
+        inletValue  uniform 140700;
+        value       uniform 140700;
+    }
+
+    darkstarFilledScaledDown
+    {
+        type        omegaWallFunction;
+        value       uniform 140700;
+    }
+
+    farfield
+    {
+        type        freestream;
+        freestreamValue uniform 140700;
+    }
+
+    symmetry
+    {
+        type        symmetryPlane;
+    }
+}

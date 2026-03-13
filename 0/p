@@ -1,0 +1,48 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      p;
+}
+
+// rhoPimpleFoam uses thermodynamic pressure (Pa), not p/rho
+// ISA @ 3000ft --> p = 97717 Pa
+
+dimensions      [1 -1 -2 0 0 0 0];
+
+internalField   uniform 97717;
+
+boundaryField
+{
+    inlet
+    {
+        type        zeroGradient;
+    }
+    // letting p float at inlet (fixed v)
+
+    outlet
+    {
+        type        fixedValue;
+        value       uniform 97717;
+    }
+    // p outlet
+    // allows flow to exit freely
+
+    darkstarFilledScaledDown
+    {
+        type        zeroGradient; // noSlip;
+    }
+    // no-slip wall w wall functions for k-omega SST (y+ 30-300)
+
+    farfield
+    {
+        type        freestreamVelocity;
+        value       uniform (303.1 0 0);
+    }
+
+    symmetry
+    {
+        type        symmetryPlane;
+    }
+}

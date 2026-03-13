@@ -1,0 +1,132 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+
+application         rhoPimpleFoam;
+
+startFoam           startTime;
+
+startTime           0;
+
+stopAt              endTime;
+
+endTime             0.05;
+    // adjust end-time based on domain length / flow-through time
+    // flow-through estimate: domain is ~2m long --> t_flow = 2/303.1 = 0.0066s
+    // run ~5-10 flow-throughs for convergence --> endTime ~0.05s
+
+deltaT              1e-07;
+    // CFL-limited timestep (Mach 0.9 is near sonic --> keep Co < 0.5 initially)
+    // to remain stable: start small then ramp up 
+
+writeControl        adjustableRunTime;
+writeInterval       0.005;
+
+purgeWrite          0;
+
+writeFormat         binary;     // faster than ascii for big meshes
+
+writePrecision      8;
+
+writeCompression    off;
+
+timeFormat          general;
+
+timePrecision       8;
+
+runTimeModifiable   true;
+
+// adjust timestep to maintain Courant # target
+adjustTimeStep      yes;
+maxCo               0.5;        // conservative Co for transonic startup
+maxDeltaT           1e-05;      // cap on timestep size
+
+// FUNCTIONS FOR AERODYANMIC FORCES AND MACH MONITORING
+functions
+{
+    // drag, lift, pitching moment on rocket surface
+    forces
+    {
+        type        forces;
+        libs        ("libforces.so");
+        writeControl    timeStep;
+        writeInterval   10;
+
+        patches     (darkstarFilledScaledDown);
+
+        rho         rhoInf;
+        rhoInf      1.2054;     // ISA @ 3000ft
+
+        CofR        (0 0 0);    // moment reference point - adjust to your CG
+        pitchAxis   (0 1 0);    // pitch about y axis
+
+        log         yes;
+    }
+
+    //force coeffs (Cd, Cl, Cm)
+    forceCoeffs
+    {
+        type        forceCoeffs;
+        libs        ("libforces.so");
+        writeControl    timeStep;
+        writeInterval   10;
+
+        patches     (darkstarFilledScaledDown);
+
+        rho         rhoInf;
+        rhoInf      1.2054;
+
+        lRef        0.1567;      // reference length = outer diameter
+        Aref        0.01928;     // reference area = (pi/4)D^2 = 0.01928 m^2
+
+        CofR        (0 0 0);
+        liftDir     (0 0 1);    // lift in z dir (adjust if needed)
+        dragDir     (1 0 0);    // drag in x dir (freestream)
+        pitchAxis   (0 1 0);
+
+        log         yes;
+    }
+
+    // mach # field (visualizing shock structure)
+    MachNo
+    {
+        type        machNo;
+        libs        ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+        log         yes;
+    }
+
+    // wall y+ for checking wall function validity (target y+ = 30-300)
+    yPlus
+    {
+        type        yPlus;
+        libs        ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+        log         yes;
+    }
+
+    // residuals monitoring
+    residuals
+    {
+        type        solverInfo;
+        libs        ("libutilityFunctionObjects.so");
+        writeControl    timeStep;
+        writeInterval   1;
+        fields      (U p h k omega);
+    }
+
+    // aerodynamics heating on rocket surface
+    wallHeatFlux
+    {
+        type    wallHeatFlux;
+        libs    ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+        patches (darkstarFilledScaledDown);
+        log     yes;
+    }
+}

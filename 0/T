@@ -1,0 +1,47 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
+}
+
+// ISA @ 3000ft --> T = 282.21K
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 282.21;
+
+boundaryField
+{
+    inlet
+    {
+        type        fixedValue;
+        value       uniform 282.21;
+    }
+
+    outlet
+    {
+        type        inletOutlet;
+        inletValue  uniform 282.21;
+        value       uniform 282.21;
+    }
+
+    darkstarFilledScaledDown
+    {
+        type        zeroGradient; // temperatureThermo;
+        value       uniform 282.21;
+        // return to zeroGradient and remove the wallHeatFlux function from controlDict if heat complicates things too much
+    }
+
+    farfield
+    {
+        type        freestream;
+        freestreamValue uniform 282.21;
+    }
+
+    symmetry
+    {
+        type        symmetryPlane;
+    }
+}

@@ -1,0 +1,27 @@
+cd "${0%/*}" || exit 1
+. "$WM_PROJECT_DIR/bin/tools/RunFunctions"
+
+runApplication surfaceFeatures
+
+runApplication blockMesh
+
+runApplication checkMesh -constant
+
+runApplication snappyHexMesh -overwrite
+
+runApplication checkMesh
+
+runApplication decomposePar
+
+runParallel $(getApplication)
+
+runApplication reconstructPar
+
+echo ""
+echo "====================================="
+echo " Run complete."
+echo " Check postProcessing/ for:"
+echo "   forces/    -> drag, lift, moments"
+echo "   forceCoeffs/ -> Cd, Cl, Cm"
+echo "   yPlus/     -> confirm y+ = 30-300"
+echo "====================================="

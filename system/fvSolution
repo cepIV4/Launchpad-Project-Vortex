@@ -1,0 +1,125 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+
+// stability first: conservative relaxation, tight tolerances
+
+solvers
+{
+    // density (rho): explicit update, no linear solve needed
+    rho
+    {
+        solver      diagonal;
+    }
+
+    rhoFinal
+    {
+        $rho;
+    }
+
+    // pressure: robust PBiCGStab w DILU preconditioner
+    p
+    {
+        solver      PBiCGStab;
+        preconditioner  DILU;
+        tolerance   1e-08;
+        relTol      0.01;
+    }
+
+    pFinal
+    {
+        $p;
+        relTol      0;
+    }
+
+    // velocity
+    U
+    {
+        solver      PBiCGStab;
+        preconditioner  DILU;
+        tolerance   1e-08;
+        relTol      0.1;
+    }
+
+    UFinal
+    {
+        $U;
+        relTol      0;
+    }
+
+    // energy (enthalpy h)
+    h
+    {
+        solver      PBiCGStab;
+        preconditioner  DILU;
+        tolerance   1e-08;
+        relTol      0.1;
+    }
+
+    hFinal
+    {
+        $h;
+        relTol      0;
+    }
+
+    // turbulence quantities
+    "(k|omega)"
+    {
+        solver      PBiCGStab;
+        preconditioner  DILU;
+        tolerance   1e-08;
+        relTol      0.1;
+    }
+
+    "(k|omega)Final"
+    {
+        $k;
+        relTol      0;
+    }
+}
+
+PIMPLE
+{
+    nOuterCorrectors    3;              // outer PIMPLE loops: more --> more stability
+    nCorrectors         2;              // inner p corrector loops
+    nNonOrthogonalCorrectors    1;      // increase to 2 if mesh is non-orthogonal
+
+    transonic           yes;
+        // transonic uses density-based p equation
+
+    residualControl
+    {
+        U
+        {
+            relTol      0;
+            tolerance   1e-05;
+        }
+        p
+        {
+            relTol      0;
+            tolerance   1e-05;
+        }
+        h
+        {
+            relTol      0;
+            tolerance   1e-05;
+        }
+    }
+}
+
+relaxationFactors
+{
+    // stability-first: conservative under-relaxation
+    equations
+    {
+        U           0.7;
+        h           0.7;
+        k           0.5;
+        omega       0.5;
+    }
+}

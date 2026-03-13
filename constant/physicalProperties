@@ -1,0 +1,51 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      physicalProperties;
+}
+
+// air as calorically perfect gas for Mach 0.9 external aerodynamics
+
+thermoType
+{
+    type            hePsiThermo;        // compressible --> rho from p/RT
+    mixture         pureMixture;
+    transport       sutherland;         // Sutherland viscosity law
+    thermo          janafThermo;        // JANAF cp model
+        // may be just janaf
+    equationOfState perfectGas;
+    specie          specie;
+    energy          sensibleEnthalpy;
+}
+
+mixture
+{
+    specie
+    {
+        molWeight       28.966;         // air's g/mol
+    }
+
+    thermodynamics
+    {
+        Tlow            200;
+        Thigh           6000;
+        Tcommon         1000;
+
+        highCpCoeffs    (3.57304 -4.2e-04 7.88e-07 -5.4e-10 1.33e-13 -1047 3.12);
+            // high-T coeffs (1000 - 6000K)
+
+        lowCpCoeffs     (3.09590 1.311e-03 -2.71e-07 -7.50e-9 4.83e-12 -983.2 5.70);
+            // low-T coeffs (200 - 1000K) - Cp = 1005 J/kg/K at 282K
+    }
+
+    transport
+    {
+        As              1.45e-06;       // kg/m/s/K^0.5
+        Ts              110.4;          // K
+        // Sutherland law --> mu = ((As)(T^1.5)) / (T + Ts) 
+        // mu = 1.757e-5 Pa.s at T = 282.21K (ISA 3000ft)
+    }
+}

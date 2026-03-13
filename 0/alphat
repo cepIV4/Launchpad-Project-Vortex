@@ -1,0 +1,51 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      alphat;
+}
+
+// Turbulent thermal diffusivity [kg/m/s]
+// Required by rhoPimpleFoam for the energy equation.
+// Computed internally by the solver from nut/Prt — initial value of 0 is correct.
+
+dimensions      [1 -1 -1 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    inlet
+    {
+        type        calculated;
+        value       uniform 0;
+    }
+
+    outlet
+    {
+        type        calculated;
+        value       uniform 0;
+    }
+
+    darkstarFilledScaledDown
+    {
+        type        compressible::alphatWallFunction;
+        Prt         0.85;
+        value       uniform 0;
+    }
+    //wall func for turbulent heat flux
+    //matches nutkWallFunction on nut
+    //Prt = 0.85 is standard for air
+
+    farfield
+    {
+        type        calculated;
+        value       uniform 0;
+    }
+
+    symmetry
+    {
+        type        symmetryPlane;
+    }
+}

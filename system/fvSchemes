@@ -1,0 +1,66 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+
+// stability-first settings for transonic external aero (mach 0.9)
+// bounded schemes throughout to avoid oscillations near shocks/stagnation
+
+ddtSchemes
+{
+    default         Euler;          // first-order implicit: robust for startup
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+    grad(U)         cellLimited Gauss linear 1;     // limited to suppress wiggles
+    grad(k)         cellLimited Gauss linear 1;
+    grad(omega)     cellLimited Gauss linear 1;
+}
+
+divSchemes
+{
+    default         none;
+
+    // momentum: limited linear for stability in transonic regions
+    div(phi,U)      Gauss limitedLinearV 1;         
+
+    // energy
+    div(phi,h)      Gauss limitedLinear 1;
+    div(phi,K)      Gauss limitedLinear 1;
+    // div(phi,e)      Gauss limitedLinear 1;
+
+    // turbulence: bounded to prevent negative k/omega
+    div(phi,k)      Gauss limitedLinear 1;
+    div(phi,omega)  Gauss limitedLinear 1;
+
+    // pressure work and viscuous dissipation terms
+    div(phid,p)     Gauss limitedLinear 1;
+    div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+}
+
+snGradSchemes
+{
+    default         corrected;
+}
+
+fluxRequired
+{
+    default         no;
+    p               ;
+}
